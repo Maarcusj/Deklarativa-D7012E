@@ -168,8 +168,210 @@ onSeparateLines (x:xs) = x ++ "\n" ++ onSeparateLines xs
 
 ---- 5.23 -----
 
+duplicate :: String -> Int -> String
+duplicate [] _ = ""
+duplicate x y 
+ | y <= 0 = ""
+ | otherwise = x ++ duplicate x (y - 1) 
+
+
+ ---- 5.24 ------ 
+
 pushRight :: String -> String
 pushRight [] = ""
 pushRight x 
  | length x <= 12 = pushRight ("_|" ++ x)
  | otherwise = "_|" ++ x  
+
+
+ ----- Chapter 6 ---- 
+
+--- 7.2  ----
+addTwo :: [Int] -> Int
+addTwo [] = 0
+addTwo (x:xs)  = x + addTwo xs
+
+----- 7.3 ----- 
+
+addTwo2 :: [Int] -> Int
+addTwo2 x 
+ | length x <= 0 = 0
+ |otherwise = (head x) + addTwo2 (tail x)
+
+
+ ---- 7.4 ---- 
+product2 :: [Int] -> Int
+product2 [] = 1
+product2 (x:xs) = x * product2 xs
+
+product3 :: [Int] -> Int
+product3 xs = foldr (*) 1 xs
+
+--- 7.5 ---- 
+
+and2 , or2 ::[Bool] -> Bool
+and2 xs = foldr (&&) True xs
+or2 ys = foldr (||) False ys
+
+------ 7.7 ------ 
+
+unique' :: (Eq a) => [a] -> [a]
+unique' [] = []
+unique' (x:xs)
+ | elem x xs = unique' (filter (/=x) xs)
+ | otherwise = x:unique' (filter (/=x) xs)
+
+----- 7.8 ---- 
+
+reverse2::[t]->[t]
+reverse2 [] = []
+reverse2 (x:xs) = reverse2 xs ++ [x] 
+
+
+unzip2::[(a,b)] -> ([a],[b])
+unzip2 [] = ([],[])
+unzip2 ((a, b):xs) = (a : fst x, b : snd y)
+    where 
+     y = unzip2 xs
+     x = unzip2 xs
+
+
+unzipThis::[(a,b)] -> ([a],[b])
+unzipThis [] = ([], []) -- Defaults to a pair of empty lists, not null
+unzipThis xs = (map fst xs, map snd xs)
+
+
+---- 7.9 ----- 
+
+ins::Int-> [Int] -> [Int]
+ins n [] = [n]
+ins n (x:xs)
+ | n <= x = n:x:xs
+ |otherwise = x:ins n xs
+
+iSort:: [Int] -> [Int]
+iSort xs = foldr ins [] xs
+
+
+maxMin::[Int]->[Int]
+maxMin xs = [head sorted] ++ [last sorted] 
+ where 
+  sorted = (iSort xs) 
+
+maxMinFold :: Ord a => [a] -> (a, a)
+maxMinFold (x:xs) = foldr (\x (tailMin, tailMax) -> (min x tailMin,max x tailMax)) (x,x) xs
+
+maxMinFold2 :: Ord a => [a] -> (a, a)
+maxMinFold2 (x:xs) = foldr maxtuple (x,x) xs
+
+maxtuple::Ord a => a -> (a, a)-> (a, a)
+maxtuple x (y,z) = (min x y, max x z) 
+
+--- 7.14 ------ 
+
+drop2::Int ->[a]->[a]
+drop2 _ [] = []
+drop2 n xs 
+ | n > 0 = drop2 (n-1) (tail xs)
+ | otherwise =  xs 
+
+splitAt2::Int ->[a] -> ([a],[a])
+splitAt2  _ [] = ([],[])
+splitAt2 0 xs = ([], xs)
+splitAt2 n (x:xs) = (x:y, z)
+ where (y,z) = splitAt2 (n-1) xs 
+  
+
+
+---- 7.18 ----- 
+
+sublist::String -> String -> Bool
+sublist [] [] = True
+sublist [] _ = True
+sublist xs ys 
+ | cut /= "" = sublist (tail xs) (tail ys)
+ | otherwise = False
+  where cut = cutAtChar (head xs) ys     
+
+
+inString::Char -> String -> Bool
+inString _ [] = False
+inString x (y:ys)
+ | x == y = True
+ | otherwise = inString x ys
+
+
+subsequence::String -> String -> Bool
+subsequence [] [] = True 
+subsequence _ [] = False
+subsequence [] _ = False
+subsequence xs ys
+ | head xs == head cut = subsequence (tail xs) (tail ys)
+ | otherwise = False
+ where cut = cutAtChar (head xs) ys
+
+
+cutAtChar::Char -> String -> String
+cutAtChar _ [] = []
+cutAtChar x (y:ys)
+ | x == y = (y:ys)
+ | otherwise = cutAtChar x ys
+
+seqOrList::String->String->String
+seqOrList xs ys
+ | sublist xs ys && subsequence xs ys = "SubList and Subsequence"
+ | sublist xs ys && not (subsequence xs ys) = "Sublist"
+ | not (sublist xs ys) && not (subsequence xs ys) = "subsequence"
+ | otherwise = "Nothing" 
+
+
+---- Chapter 9 ------ 
+---- 9.2 ----- 
+
+myLength :: [a] -> Integer
+myLength = foldr (\x -> (+) 1) 0
+
+
+
+--- 9.4 --- 
+g1::Int->Int
+g1 x = x + 1  
+
+g2:: Int -> Int
+g2 x = x * 2   
+
+gf2::[Int] -> [Int]
+gf2 x = map g1 (map g2 x) 
+
+gf::[Int] -> [Int]
+gf x = map (g2 . g1) x
+
+---- 9.6 ---- 
+
+squareList::[Int] -> [Int]
+squareList xs = map (\x -> x^2) xs
+
+sumSquare::[Int] -> Int
+sumSquare xs = foldr (+) 0 (map (\x -> x^2) xs)
+
+greaterZero::[Int] -> Bool
+greaterZero xs
+ | myLength (filter (\x -> x <= 0) xs) > 0 = False
+ | otherwise = True  
+
+--- 9.7 ----
+
+minFunc::(Int->Int) -> [Int] -> Int
+minFunc f x = foldr min (head list) list
+ where list = map f x 
+
+equalFunc::(Int->Int) -> [Int] -> Bool
+equalFunc f x 
+ | myLength (filter (\t -> t /= h) list) > 0 = False
+ | otherwise = True
+ where 
+  list = map f x
+  h = head list
+
+
+ 
