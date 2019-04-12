@@ -335,7 +335,10 @@ myLength = foldr (\x -> (+) 1) 0
 
 --- 9.4 --- 
 g1::Int->Int
-g1 x = x + 1  
+g1 x = x + 1 
+
+f4::Int->Int
+f4 x = x - x  
 
 g2:: Int -> Int
 g2 x = x * 2   
@@ -361,17 +364,45 @@ greaterZero xs
 
 --- 9.7 ----
 
-minFunc::(Int->Int) -> [Int] -> Int
-minFunc f x = foldr min (head list) list
- where list = map f x 
+minFunc::(Int->Int) -> Int -> Int
+minFunc f n = foldr min (head list) list
+ where list = map f [0..n] 
 
-equalFunc::(Int->Int) -> [Int] -> Bool
-equalFunc f x 
- | myLength (filter (\t -> t /= h) list) > 0 = False
- | otherwise = True
- where 
-  list = map f x
-  h = head list
+allEqual :: (Int -> Int) -> Int -> Bool
+allEqual f n = and (map (==(f 0)) (map f [0..n]))
+
+
+---- 9.9 -----
+
+iter::Int -> (a->a) -> a -> a
+iter 0 f x = x
+iter n f x = iter (n-1) f (f x)
+
+--- 9.10 ----
+
+multTwo::Int->Int
+multTwo 0 = 1
+multTwo x = double 1 * multTwo (x-1) 
+
+---- 9.11 ----- 
+
+sum1::[Int] -> Int
+sum1 [] = 0
+sum1 xs = foldr (+) 0 (map (\x -> x^2) xs)
+
+---  9.16 ---- 
+
+filterFirst :: (a -> Bool) -> [a] -> [a]
+filterFirst p [] = []
+filterFirst p (x:xs) 
+ |p x = x : filterFirst p xs
+ |otherwise = xs 
+
+---- 9.17 -----
+
+filterLast :: (a -> Bool) -> [a] -> [a]
+filterLast p list = reverse (filterFirst p (reverse list))
+
 
 
  
