@@ -373,5 +373,76 @@ equalFunc f x
   list = map f x
   h = head list
 
+ 
+
+--- Chapter 10 -------
+--- 10.3 -------
+
+t :: Int -> Int
+t x = x + 1
+
+t2 :: Int -> Int
+t2 x = x + 1
+
+t3 :: Int -> Int
+t3 x = x + 1
+
+composeList :: [a -> a] -> a -> a
+composeList xs s =  foldr (.) id xs s 
+
+------ 10.7 ------
+--flip2 :: (a->b->c) -> (b -> a -> c)
+--flip2 f = g
+--	where g x y = g y x  
+
+---- 10.8 ----- 
+
+detect :: Char -> Bool
+detect x = (\x -> not (x `elem` " \t\n")) x 
+
+------- 10.13 ------
+tjo :: [Int] -> [Int]
+tjo x = filter (>0) $ map (+1) x
+
+tjo2 :: [Int] -> [Int]
+tjo2 x = map (+1) $ filter (>= 0) x
+------- 10.14 -----
+
+type Picture = [[Char]]
 
  
+
+whiteSquare :: [Char]
+whiteSquare = "  " 
+
+blackSquare :: [Char]
+blackSquare = "##" 
+
+twoWB :: [Char]
+twoWB = whiteSquare ++ blackSquare
+
+twoBW :: [Char]
+twoBW =  blackSquare ++ whiteSquare
+
+rowWB :: Int -> [Char] 
+rowWB 0 = "\n"
+rowWB x = twoWB ++ (rowWB (x-2) )
+
+rowBW :: Int -> [Char] 
+rowBW 0 = "\n"
+rowBW x = twoBW ++ (rowBW (x-2) )
+
+
+chessBoard :: Int -> Picture
+chessBoard 0 = []
+chessBoard x = [ rowWB 8] ++ [rowBW 8] ++ chessBoard (x - 2)
+
+printThis :: String -> IO ()
+printThis x = putStr x
+
+makeBoard :: Picture -> String
+makeBoard (x:xs) = x ++ makeBoard xs 
+ 
+
+---- chapter 12 ----- 
+
