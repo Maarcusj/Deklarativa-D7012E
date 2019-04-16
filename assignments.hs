@@ -404,8 +404,6 @@ filterLast :: (a -> Bool) -> [a] -> [a]
 filterLast p list = reverse (filterFirst p (reverse list))
 
 
- 
-
 --- Chapter 10 -------
 --- 10.3 -------
 
@@ -441,8 +439,6 @@ tjo2 x = map (+1) $ filter (>= 0) x
 
 type Picture = [[Char]]
 
- 
-
 whiteSquare :: [Char]
 whiteSquare = "  " 
 
@@ -476,4 +472,30 @@ makeBoard (x:xs) = x ++ makeBoard xs
  
 
 ---- chapter 12 ----- 
+
+
+-- 12.2 ---- 
+
+numEqual::Eq a => [a] -> a -> Int
+numEqual [] _ = 0
+numEqual xs x = length (filter (==x) xs) 
+
+--- 12.3 ----
+
+onLookupFirst::Eq a => [(a,b)] -> a -> b
+onLookupFirst xs t = snd (head (filter (\(x,y)-> x==t) xs))
+
+onLookupSecond::Eq a => [(a,b)] -> a -> (b,a)
+onLookupSecond xs t = (snd tup , fst tup)
+ where tup = head (filter (\(x,y)-> x==t) xs)
+
+--- 12.4 ---- 
+
+class Visible a where
+ toString :: a -> String
+ size:: a -> Int
+
+instance Visible Int where
+ size x = x * 2
+ toString x = "Not yet implemented" 
 
