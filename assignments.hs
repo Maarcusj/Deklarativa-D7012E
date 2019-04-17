@@ -489,13 +489,72 @@ onLookupSecond::Eq a => [(a,b)] -> a -> (b,a)
 onLookupSecond xs t = (snd tup , fst tup)
  where tup = head (filter (\(x,y)-> x==t) xs)
 
---- 12.4 ---- 
+--- 12.4 , 12.5---- 
 
 class Visible a where
  toString :: a -> String
  size:: a -> Int
 
+instance Visible Char where
+ size _ = 1 
+ toString y = [y]  
+
 instance Visible Int where
- size x = x * 2
- toString x = "Not yet implemented" 
+ toString 0 = "0"
+ toString 1 = "1"
+ toString 2 = "2"
+ toString 3 = "3"
+ toString 4 = "4"
+ toString 5 = "5"
+ toString 6 = "6"
+ toString 7 = "7"
+ toString 8 = "8"
+ toString 9 = "0"
+ toString n = foldr1 (++) (map toString (intList n))
+ size x        = x  
+
+instance (Visible a, Visible b)  => Visible (a, b) where
+ toString (a,b)  = toString a ++ toString b
+ size _ = 10  
+
+instance Visible Bool where
+  toString True  = "True"
+  toString False = "False"
+  size _         = 1
+
+intList :: Int -> [Int]
+intList n
+ |(mod n 10) /= n = intList (div n 10) ++ [mod n 10]
+ |otherwise = [n]
+
+sizeTuple::(Visible a, Visible b) => (a,b) -> Int
+sizeTuple (x,y) = size (x,y)
+
+stringTuple::(Visible a, Visible b) => (a,b) -> String
+stringTuple (x,y) = toString (x,y)
+
+toSize :: Visible a => a -> Int 
+toSize x = size x 
+
+toStr :: Visible a => a -> String 
+toStr x = toString x
+
+comparer :: (Visible a, Visible a1) => a -> a1 -> Bool 
+comparer  x y = size x <= size y 
+
+
+---- 12.8 ----
+
+---- 12.10 --- 
+showBoolFun :: (Bool -> Bool) -> String
+showBoolFun f = "True:\t" ++ (toString (f True)) ++ "\nFalse:\t" ++ (toString (f False)) ++ "\n"
+
+
+showBoolFunGen :: (a -> String) -> (Bool -> a) -> String
+showBoolFunGen am f = "True:\t" ++ (am (f True)) ++ "\n" ++ "False:" ++ "\t" ++ (am (f False)) ++ "\n"
+
+boolFunc::Bool -> Bool
+boolFunc x = x
+
+---- 
 
