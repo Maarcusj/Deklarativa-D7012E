@@ -511,7 +511,7 @@ instance Visible Int where
  toString 8 = "8"
  toString 9 = "0"
  toString n = foldr1 (++) (map toString (intList n))
- size x        = x  
+ size x = x  
 
 instance (Visible a, Visible b)  => Visible (a, b) where
  toString (a,b)  = toString a ++ toString b
@@ -556,5 +556,12 @@ showBoolFunGen am f = "True:\t" ++ (am (f True)) ++ "\n" ++ "False:" ++ "\t" ++ 
 boolFunc::Bool -> Bool
 boolFunc x = x
 
----- 
+---- Chapter 13 ----
+
+--- Skippa , fett tråkigt med type checking
+-- Gör senare om tid finns
+
+---- Chapter 14 --- 
+
+
 
