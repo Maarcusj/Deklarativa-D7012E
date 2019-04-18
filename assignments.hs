@@ -564,4 +564,73 @@ boolFunc x = x
 ---- Chapter 14 --- 
 
 
+--- 14.1 ---
 
+data Temp = Cold | Hot
+ deriving (Eq , Ord , Show , Read)
+
+data Season = Spring | Summer | Autumn | Winter
+ deriving (Eq , Ord , Show , Read) 
+
+data Shape = Circle Float | Rectangle Float Float | Triangle Float Float Float
+ deriving ( Show , Read)
+
+weather:: Season -> Temp
+weather x 
+ | x == Summer = Hot
+ | otherwise = Cold
+
+--- 14.4 ----
+
+shapePerimeter:: Shape -> Float
+shapePerimeter (Circle r) = 2 * pi * r
+shapePerimeter (Rectangle x y) = 2*(x+y)
+shapePerimeter (Triangle x y z) = x + y + z
+
+--- 14.5 ----- 
+
+isRound:: Shape -> Bool
+isRound (Circle _) = True 
+isRound (Rectangle _ _ ) = False
+isRound (Triangle _ _ _) = False
+
+area::Shape -> Float
+area (Circle r) = pi * r^2
+area (Rectangle a b) = a * b
+area (Triangle x y z) = sqrt (p*(p-x)*(p-y)*(p-z))
+ where p = (x + y + z)/2
+
+--- 14.6 ----
+isRegular :: Shape -> Bool 
+isRegular (Circle _) = True
+isRegular (Rectangle x y)
+ |x==y = True
+ |otherwise = False
+isRegular (Triangle a b c)
+ |a==b && b==c && c==a = True
+ |otherwise = False
+
+-- 14.8 ----
+
+instance Eq Shape where
+  (Circle a) == (Circle b) = a==b && (a>0 && b>0)
+  (Rectangle h w) == (Rectangle h' w') = ((h==h' && w==w') || (h==w' && w==h'))
+  (Triangle a b c) == (Triangle d e f) = (([a, b, c] == [d, e, f]) || ([a, b, c] == [e, d, f]) || ([a, b, c] == [f, e, d]))
+  
+
+--- 14.9 , 14.10 --- 
+type Point = (Float,Float)
+
+data NewShape = CircleP Float Point| RectangleP Float Float Point| TriangleP Float Float Float Point
+ deriving ( Eq , Ord , Show , Read)
+
+move:: Float -> Float -> NewShape -> NewShape
+move x y (CircleP r p) = CircleP r (newPoint x y p)
+move x y (RectangleP h w p) = RectangleP h w (newPoint x y p)
+move x y (TriangleP s1 s2 s3 p) = TriangleP s1 s2 s3 (newPoint x y p)
+
+
+newPoint::Float -> Float -> Point -> Point
+newPoint x y (p1,p2) = (p1 + x, p2 + y) 
+
+--- 
