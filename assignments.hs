@@ -633,4 +633,28 @@ move x y (TriangleP s1 s2 s3 p) = TriangleP s1 s2 s3 (newPoint x y p)
 newPoint::Float -> Float -> Point -> Point
 newPoint x y (p1,p2) = (p1 + x, p2 + y) 
 
---- 
+--- 14.15 ----
+data Expr = Lit Int |Add Expr Expr | Sub Expr Expr
+
+eval :: Expr -> Int
+eval (Lit n) = n
+eval  (Add e1 e2) = (eval e1) + (eval e2)
+eval (Sub e1 e2) = (eval e1) - (eval e2)
+
+sizeExpr::Expr -> Int
+sizeExpr (Lit _ ) = 0
+sizeExpr (Add e1 e2) = 1 + sizeExpr e1 + sizeExpr e2
+sizeExpr (Sub e1 e2) = 1 + sizeExpr e1 + sizeExpr e2
+
+data Tree a = Nil | Node a (Tree a) (Tree a)
+ deriving (Eq , Ord , Show , Read)
+
+depth::Tree a -> Int
+depth Nil = 0
+depth (Node n t1 t2) = 1 + max (depth t1) (depth t2)
+
+
+--- 14.28 ---
+
+-- Chapter 16 ---
+
