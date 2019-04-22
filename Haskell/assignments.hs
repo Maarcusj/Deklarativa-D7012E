@@ -136,8 +136,6 @@ f2 n = f (map (f1 3) [0..n])
 
 -- Chapter 5-7 -------
 -- 5.2 ----  
-
-
 orderTriple :: (Int,Int,Int) -> (Int,Int,Int)
 orderTriple (a,b,c)
 	| (a > b && b > c) = (a,b,c)
@@ -146,6 +144,8 @@ orderTriple (a,b,c)
 	| a < b && a < c && b > c = (b,c,a)
 	| a < c && a > b = (c,a,b)
 	| a < c && a < b && b < c = (c,b,a)
+
+
 	
 ----------------------	
 ---- 5.10 ------------
