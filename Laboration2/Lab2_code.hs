@@ -105,6 +105,22 @@ simplify (Op oper left right) =
       (op,le,re)      -> Op op le re
 simplify (App op x) = App op (simplify x) 
 
+mkfun::(EXPR,EXPR) -> (Float->Float)
+mkfun (Const x, _ ) = (\t->s)
+  where s = fromIntegral x     
+mkfun (Var z ,Var x)  = (\x->x)            
+mkfun (func, Var x) = case func of
+ (Op "+" left right) -> (\t->(mkfun (left ,Var x)) . t)  (mkfun (right ,Var x))
 
-mkfun::(EXPR,EXPR) -> (Float -> Float)
-mkfun (x,y) = (eval x [("x",3.0)])    
+
+init2::[a] -> [a]
+init2 [] = []
+init2 [_] = []
+init2 (x:xs) = x:(init2 xs)
+
+
+suffixes::[a] -> [[a]]
+suffixes [] = []
+suffixes xs = [xs] ++ suffixes(tail xs)
+
+

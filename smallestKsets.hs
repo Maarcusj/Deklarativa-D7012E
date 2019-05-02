@@ -32,3 +32,10 @@ smallestKsets::[Int] -> Int -> IO ()
 smallestKsets [] _ = error "Empty list"
 smallestKsets xs n = putStr ("Size\ti\tj\tSublist\n" ++ concat (map toString2 (take n (listSort (subLists xs 1)))))     
 
+--compress::[Int] -> [(Int,Int)]
+--compress [] = []
+--compress (x:xs) = [(x,y)| ]
+
+sublist::[Int]->[[Int]]
+sublist [] = []
+sublist (x:xs) = [t | t<-xs, t== x || t == x + 1]
