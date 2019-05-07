@@ -60,3 +60,4 @@ fail cs = Nothing
     case p cs of
     Nothing -> Nothing
     Just(a, cs') -> k a cs'
+

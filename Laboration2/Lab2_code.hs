@@ -105,22 +105,23 @@ simplify (Op oper left right) =
       (op,le,re)      -> Op op le re
 simplify (App op x) = App op (simplify x) 
 
-mkfun::(EXPR,EXPR) -> (Float->Float)
-mkfun (Const x, _ ) = (\t->s)
-  where s = fromIntegral x     
-mkfun (Var z ,Var x)  = (\x->x)            
-mkfun (func, Var x) = case func of
- (Op "+" left right) -> (\t->(mkfun (left ,Var x)) . t)  (mkfun (right ,Var x))
+-- pArt 2
 
+mkfun::(EXPR,EXPR) -> (Float->Float)           
+mkfun (func, Var x) = (\t -> eval func [(x,t)]) -- För varje argument t sätt in skicka in EXPR [(Var x, t)] 
 
-init2::[a] -> [a]
-init2 [] = []
-init2 [_] = []
-init2 (x:xs) = x:(init2 xs)
+-- Part 3
+findZero::String -> String -> Float -> Float
+findZero v body x0 = newtRaph f f' x0
+ where
+  exp1 = parse body 
+  exp2 = parse v
+  f = mkfun (exp1, exp2)
+  f' = mkfun (diff (exp2) (exp1), (exp2))
 
-
-suffixes::[a] -> [[a]]
-suffixes [] = []
-suffixes xs = [xs] ++ suffixes(tail xs)
-
-
+newtRaph::(Float->Float) -> (Float->Float) -> Float -> Float
+newtRaph f f' x
+ | abs (x - x0) <= 0.0001 = x0
+ | otherwise = newtRaph f f' x0 
+ where
+  x0 = x - ((f x) / (f' x))   
