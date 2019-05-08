@@ -13,7 +13,7 @@ insTuple n (x:xs)
  | (getSum n) < (getSum x) = n:x:xs
  | otherwise = x:insTuple n xs
 
-listSort:: [(Int,Int,Int,[Int])]->[(Int,Int,Int,[Int])]
+listSort::[(Int,Int,Int,[Int])]->[(Int,Int,Int,[Int])]
 listSort xs = foldr insTuple [] xs
 
 getSum::(Int,Int,Int,[Int]) -> Int
@@ -30,4 +30,9 @@ toString2 (x,y,z,l) = show x ++ "\t" ++ show y ++ "\t" ++ show z ++ "\t" ++ show
 
 smallestKsets::[Int] -> Int -> IO ()
 smallestKsets [] _ = error "Empty list"
-smallestKsets xs n = putStr ("Size\ti\tj\tSublist\n" ++ concat (map toString2 (take n (listSort (subLists xs 1)))))     
+smallestKsets xs n = putStr ("Entire list: \t" ++ show xs ++ "\n" ++"Size\ti\tj\tSublist\n" ++ concat (map toString2 (take n (listSort (subLists xs 1)))))     
+
+--smallestKsets [-1,2,-3,4,-5] 3
+--smallestKsets [x*(-1)^x | x<-[1..100]] 15
+--smallestKsets [24,-11,-34,42,-24,7,-19,21] 6
+--smallestKsets [3,2,-4,3,2,-5,-2,2,3,-3,2,-5,6,-2,2,3] 8
