@@ -76,7 +76,7 @@ shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 -- Dictionary.insert(Variable,Value)
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) _ = n
-value (Var x) env = case (Dictionary.lookup x env) of Just y -> y ; _ -> error ("undefined variable" ++ x)
+value (Var x) env = case (Dictionary.lookup x env) of Just y -> y ; _ -> error (x ++ "undefined variable" )
 value (Add left right) env = (value left env) + (value right env)
 value (Sub left right) env = (value left env) - (value right env)
 value (Mul left right) env = (value left env) * (value right env)
