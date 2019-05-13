@@ -70,8 +70,27 @@ shw prec (Sub t u) = parens (prec>5) (shw 5 t ++ "-" ++ shw 6 u)
 shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 
+-- Inspired from lab 2 , eval function but replace list of tuples with dictonary.
+-- Adding divide by zero check. 
+-- Helped to check structure of Dictionary in TestExpr.
+-- Dictionary.insert(Variable,Value)
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Num n) _ = error "value not implemented"
+value (Num n) _ = n
+value (Var x) env = case (Dictionary.lookup x env) of Just y -> y ; _ -> error ("undefined variable" ++ x)
+value (Add left right) env = (value left env) + (value right env)
+value (Sub left right) env = (value left env) - (value right env)
+value (Mul left right) env = (value left env) * (value right env)
+value (Div left right) env
+ | (value right env) == 0 = error ("Divide by zero")
+ | otherwise = (value left env) `div` (value right env)
+
+--eval :: EXPR -> [(String,Float)] -> Float
+--eval (Const n) _ = fromIntegral n
+-- eval (Var x) env = case lookup x env of Just y -> y ; _ -> error (x ++ " undefined")
+--eval (Op "+" left right) env = eval left env + eval right env
+--eval (Op "-" left right) env = eval left env - eval right env
+--eval (Op "*" left right) env = eval left env * eval right env
+--eval (Op "/" left right) env = eval left env / eval right env
 
 instance Parse Expr where
     parse = expr

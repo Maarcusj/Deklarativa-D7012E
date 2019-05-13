@@ -1,6 +1,6 @@
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
               lit, number, iter, accept, require, token,
-              spaces, word, (-#), (#-)) where
+              spaces, word, (-#), (#-),semicolon) where
 import Prelude hiding (return, fail)
 import Data.Char
 import CoreParser
@@ -11,7 +11,7 @@ type T a = Parser a
 err :: String -> Parser a
 err message cs = error (message++" near "++cs++"\n")
 
-  
+-- Very important!!!
 iter :: Parser a -> Parser [a]  
 iter m = ((m # (iter m)) >-> cons) ! (return []) 
 
@@ -28,7 +28,6 @@ m #- n = (m # n) >-> fst
 --Get first space in string and iterate until no spaces exist. 
 spaces :: Parser String
 spaces = iter (char ? isSpace) 
-
 
 --removes spaces in snd string in Parser.  
 token :: Parser a -> Parser a
@@ -59,20 +58,28 @@ accept w = (token (chars (length w))) ? (==w)
 require :: String -> Parser String
 require w  = (token (chars (length w))) ? (==w) ! err w
 
+--Accepts if string is ==c otherwise nothing
 lit :: Char -> Parser Char
 lit c = token char ? (==c)
 
 digit :: Parser Char 
 digit = char ? isDigit 
 
+--Accepts if first is an integer,same as char but only for integers.
 digitVal :: Parser Integer
 digitVal = digit >-> digitToInt >-> fromIntegral
 
+--Adds on all following sequence of integers to n
 number' :: Integer -> Parser Integer
 number' n = digitVal #> (\ d -> number' (10*n+d))
           ! return n
+--Accepts all first integers in sequence          
 number :: Parser Integer
 number = token (digitVal #> number')
 
+--Accepts first double of char in string
 double :: Parser Char
 double = char #> lit
+
+semicolon::Parser Char
+semicolon = (lit ';') 
