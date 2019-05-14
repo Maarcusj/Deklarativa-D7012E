@@ -27,7 +27,8 @@ m -# n = (m # n) >-> snd
 (#-) :: Parser a -> Parser b -> Parser a
 m #- n = (m # n) >-> fst
 
---Get first space in string and iterate until no spaces exist. 
+--Get first space in string and iterate until no spaces exist.
+-- Inspired from letter, but space. 
 spaces :: Parser String
 spaces = iter (char ? isSpace) 
 
