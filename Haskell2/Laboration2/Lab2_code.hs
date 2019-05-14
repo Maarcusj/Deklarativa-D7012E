@@ -125,7 +125,7 @@ findZero v body x0 = newtRaph f f' x0
   f = mkfun (exp1, exp2)
   f' = mkfun (diff (exp2) (exp1), (exp2))
 
---Helper to find zerp.
+-- Helper to find zerp.
 -- Calc an approximation of root. 
 newtRaph::(Float->Float) -> (Float->Float) -> Float -> Float
 newtRaph f f' x
