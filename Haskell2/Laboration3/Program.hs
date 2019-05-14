@@ -22,7 +22,7 @@ makeProgram = Program
 
 makeString :: T -> String
 makeString (Program []) = []
-makeString (Program state) = Statement.makeString (head state) "" ++ makeString (Program (tail state))
+makeString (Program statement) = Statement.makeString (head statement) "" ++ makeString (Program (tail statement))
 
 --Program.exec p [3,16]
 -- Parsed program p => fromString(string)
