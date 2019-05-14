@@ -12,6 +12,8 @@ err :: String -> Parser a
 err message cs = error (message++" near "++cs++"\n")
 
 -- Very important!!!
+-- Parser a = String -> Maybe (a, String)
+-- iterates until no more in "rest" string. 
 iter :: Parser a -> Parser [a]  
 iter m = ((m # (iter m)) >-> cons) ! (return []) 
 
