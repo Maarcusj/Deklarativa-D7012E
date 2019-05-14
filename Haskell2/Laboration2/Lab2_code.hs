@@ -58,6 +58,9 @@ unparse (Var s) = s
 unparse (Op oper e1 e2) = "(" ++ unparse e1 ++ oper ++ unparse e2 ++ ")"
 unparse (App oper e1) = "(" ++ oper ++ unparse e1 ++ ")"
 
+
+--Added cos,sin,exp,log
+-- Follow pattern.
 eval :: EXPR -> [(String,Float)] -> Float
 eval (Const n) _ = fromIntegral n
 eval (Var x) env = case lookup x env of Just y -> y ; _ -> error (x ++ " undefined")
@@ -106,11 +109,14 @@ simplify (Op oper left right) =
 simplify (App op x) = App op (simplify x) 
 
 -- pArt 2
-
+-- eval expr [(x,y)]
 mkfun::(EXPR,EXPR) -> (Float->Float)           
 mkfun (func, Var x) = (\t -> eval func [(x,t)]) -- För varje argument t sätt in skicka in EXPR [(Var x, t)] 
 
 -- Part 3
+-- make functions of strings
+-- Send to netRaphs to calc new value. 
+-- If in range return value, else calculate new value.
 findZero::String -> String -> Float -> Float
 findZero v body x0 = newtRaph f f' x0
  where
@@ -119,9 +125,18 @@ findZero v body x0 = newtRaph f f' x0
   f = mkfun (exp1, exp2)
   f' = mkfun (diff (exp2) (exp1), (exp2))
 
+--Helper to find zerp.
+-- Calc an approximation of root. 
 newtRaph::(Float->Float) -> (Float->Float) -> Float -> Float
 newtRaph f f' x
  | abs (x - x0) <= 0.0001 = x0
  | otherwise = newtRaph f f' x0 
  where
   x0 = x - ((f x) / (f' x))   
+
+
+--Test
+-- unparse (simplify (diff (Var "x") (parse "exp(sin(2*x))")))
+-- mkfun (parse "x*x+2", Var "x")
+-- findZero "x" "x*x*x+x-1" 1.0      = 0.68232775
+-- findZero "y" "cos(y)*sin(y)" 2.0  =1.5707964
