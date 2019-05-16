@@ -109,7 +109,8 @@ simplify (Op oper left right) =
 simplify (App op x) = App op (simplify x) 
 
 -- pArt 2
--- eval expr [(x,y)]
+-- eval expr [("x",1.0)]
+-- Example: Eval returns value of function with x = 1.0.
 mkfun::(EXPR,EXPR) -> (Float->Float)           
 mkfun (func, Var x) = (\t -> eval func [(x,t)]) -- För varje argument t sätt in skicka in EXPR [(Var x, t)] 
 
@@ -137,6 +138,11 @@ newtRaph f f' x
 
 --Test
 -- unparse (simplify (diff (Var "x") (parse "exp(sin(2*x))")))
+
+--Test2
+-- Checked how eval worked. eval (parse "x*x+2") [("x",2.0)]
 -- mkfun (parse "x*x+2", Var "x")
+
+--Test3
 -- findZero "x" "x*x*x+x-1" 1.0      = 0.68232775
 -- findZero "y" "cos(y)*sin(y)" 2.0  =1.5707964
