@@ -57,7 +57,7 @@ move(state(State,Skey,Bkey,Package),NewState,Move) :-
  NewState = state(State,Skey,Bkey,hand),
  Move = takePackage.  
 
-%state(room,hand(left,right))
+%state(room,skey,bkey,package)
 solveR(state(_,_,_,r2),_,[]) :-
 solveR(State,N,Trace) :-
  N > 0, 
