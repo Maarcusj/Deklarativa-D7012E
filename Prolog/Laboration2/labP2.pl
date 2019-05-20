@@ -5,7 +5,7 @@ take(_, [], []).
 take(N, [X|Xs], [X|Ys]) :- M is N-1, take(M, Xs, Ys).
 
 cutlast([H, H2 | T], [H |T2]) :- cutlast([H2 | T], T2).
- cutlast([_], []).
+cutlast([_], []).
 
 sublist2([],Acc,Acc).
 sublist2(L,Acc,SubL):-
