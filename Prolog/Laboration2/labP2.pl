@@ -4,10 +4,6 @@ take(N, _, Xs) :- N =< 0, !, N =:= 0, Xs = [].
 take(_, [], []).
 take(N, [X|Xs], [X|Ys]) :- M is N-1, take(M, Xs, Ys).
 
-
-append2([],L,L). 
-   append2([H|T],L2,[H|L3])  :-  append2(T,L2,L3).
-
 cutlast([H, H2 | T], [H |T2]) :- cutlast([H2 | T], T2).
  cutlast([_], []).
 
@@ -45,10 +41,7 @@ smallestKSets(List,K):-
  insertionSort(L,Sorted),
  take(K,Sorted,Y),
  print(List,Y).
-/*listSublist([],L,L).
-listSublist([H|T],Acc,SubList):-
- \+member(H,Acc),
- listSublist(T,[[H]|Acc],SubList).*/
+
 
 printString([]). 
 printString([H|T]):-
@@ -79,10 +72,7 @@ gen(N,Acc,List):-
   
 
 test1() :- smallestKSets([-1,2,-3,4,-5],3).
-test2() :- 
- gen(100,[],X),
- smallestKSets(X,15).
-
+test2() :- gen(100,[],X), smallestKSets(X,15).
 test3() :- smallestKSets([24,-11,-34,42,-24,7,-19,21],6).
 test4() :- smallestKSets([3,2,-4,3,2,-5,-2,2,3,-3,2,-5,6,-2,2,3],8).
 test5() :- smallestKSets([],3). 
