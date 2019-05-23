@@ -132,7 +132,7 @@ getmove(1,State,Move) :-
 getmove(2,State,Move) :- 
   showState(State), 
   writeln('Computer is moving...'),
-  MaxDepth is 6, % max depth is here set to 6
+  MaxDepth is 1, % max depth is here set to 6
   mmeval(2,State,_,Move,MaxDepth,SeF), 
   write('Computer move computed by searching '), 
   write(SeF), 
@@ -201,8 +201,8 @@ mmeval(2,St,Val,BestMv,D,SeF) :-
 % if no moves left, return best Val and Mv so far (and number of 
 % states searched. 
 evalMoves(_,_,[],Val,BestMv,Val,BestMv,_,Se,Se) :- !.
-%	write('No more moves Val = '), write(Val),
-%	write(' BestMv = '), write(BestMv), nl.
+% write('No more moves Val = '), write(Val),
+% write(' BestMv = '), write(BestMv), nl.
  
 % otherwise evaluate current move (by calling mmeval on the player/state 
 % that results from this move), and replace current Best move and value 
