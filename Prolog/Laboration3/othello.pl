@@ -88,7 +88,7 @@ empty('.').
 
 % given helper: Inital state of the board
 initBoard([ [.,.,.,.,.,.], 
-            [.,.,.,.,.,.],
+            [.,.,1,2,.,.],
           [.,.,1,2,.,.], 
           [.,.,2,1,.,.], 
             [.,.,.,.,.,.], 
@@ -113,7 +113,7 @@ initialize(B, 1) :- initBoard(B).
 %     Plyr has a higher score than the other player
 
 winner(State,Plyr):-
- nomoves(State),
+ checkMoves(State),
  countStones(State,0,0, P1 ,P2),
  (Plyr = 1, P1 < P2;
   Plyr = 2, P2 < P1).
@@ -129,14 +129,18 @@ winner(State,Plyr):-
 %% define tie(State) here.
 %    - true if terminal State is a "tie" (no winner)
 
-tie(State) :- tiehelper(State).
+tie(State) :- checkTie(State).
 
-tiehelper(State) :-
-  nomoves(State),
-  countStones(State, 0, 0, P1O, P2O),
-  (P1O = P2O -> true ; fail).
+checkTie(State) :-
+  checkMoves(State),
+  countStones(State, 0, 0, P1, P2),
+  (P1 = P2 -> true ; fail).
 
-nomoves(State) :- moves(1, State, M1), !, M1 = [pass], !, moves(2, State, M2), !, M2 = [pass], !.
+checkMoves(State) :- 
+moves(1, State, MvList1), !, 
+MvList1 = [n], !,
+moves(2, State, MvList2), !, 
+MvList2 = [n], !.
 
 countStones(State,Acc1,Acc2, P1 ,P2) :-
  getStones(State,0,0,[],[],S1,S2),
@@ -164,28 +168,32 @@ getRow(State,X,Y,Acc1,Acc2,P1,P2):-
  R == '.',
  getRow(State,X1,Y,Acc1,Acc2,P1,P2)).
 
-
-inc1(X, X, 0).
-inc1(I, O, Val) :- I2 is I + 1, Val2 is Val - 1, inc1(I2, O, Val2).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%terminal(...)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% define terminal(State).
 %   - true if State is a terminal
 
-terminal(State) :- nomoves(State), !.
+terminal(State) :- checkMoves(State), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%showState(State)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% given helper. DO NOT  change this. It's used by play.pl
 %%
 showState( G ) :-
-	printRows( G ).
+  printList(['  ',0,1,2,3,4,5]),
+  nl,
+  printList([' ','____________']),
+  nl,
+	printRows( G,0).
 
-printRows( [] ).
-printRows( [H|L] ) :-
+printRows( [],_ ).
+printRows( [H|L] , N) :-
+  N2 is N + 1 ,
+  write(N),
+  write('|'),
+  write(' '),
 	printList(H),
 	nl,
-	printRows(L).
+	printRows(L,N2).
 
 printList([]).
 printList([H | L]) :-
@@ -203,7 +211,7 @@ moves(Plyr,State,MvList) :-
  getStones(State,0,0,[],[],P1,P2),
  (Plyr = 1 -> help(State,Plyr,P1,[],List);
   Plyr = 2 -> help(State,Plyr,P2,[],List)),
- (List = [] -> MvList = [pass];
+ (List = [] -> MvList = [n];
  removeDouble(List,[],List2),
  insertionSort(List2,MvList)),!.
 
@@ -235,7 +243,7 @@ checkValid(State,Dr,[X,Y],Plyr,Acc,Valid):-
   Dr = w -> D = [X1,Y];
   Dr = nw-> D = [X1,Y1]),
  
- (withinbounds(D) -> 
+ (checkBoundary(D) -> 
           get(State, D, Value),
           (Value == '.' , Acc = [] -> checkValid(State,Dr,[],Plyr,Acc,Valid);
           Value == '.' , Acc \= [] -> checkValid(State,Dr,[],Plyr,D,Valid); 
@@ -276,124 +284,13 @@ removeDouble([H|T],Acc,NewList):-
 %% define nextState(Plyr,Move,State,NewState,NextPlyr).
 %   - given that Plyr makes Move in State, it determines NewState (i.e. the next
 %     state) and NextPlayer (i.e. the next player who will move).
-% [1,0][1,1][1,2][1,3][1,4][5,1][4,2][1,3][2,4][1,4][2,4][3,4][4,4][5,4]
-/*nextState(2,pass,State,State,1):- !.
-nextState(1,pass,State,State,2):- !.
-nextState(Plyr,Move,State,NewState,NextPlyr):-
-  showState(State),
-  write('\n'),
-  (Plyr == 1 -> NextPlyr is 2; Playr == 1 -> NextPlyr is 2),
-  set(State, NewState1, Move, Plyr),
-  nextStateHelper(Plyr, NewState1, NewState2, Move, n), 
-  nextStateHelper(Plyr, NewState2, NewState3, Move, nw),
-  nextStateHelper(Plyr, NewState3, NewState4, Move, w),
-  nextStateHelper(Plyr, NewState4, NewState5, Move, sw),
-  nextStateHelper(Plyr, NewState5, NewState6, Move, s),
-  nextStateHelper(Plyr, NewState6, NewState7, Move, se),
-  nextStateHelper(Plyr, NewState7, NewState8, Move, e),
-  nextStateHelper(Plyr, NewState8, NewState, Move, ne).  
+% 
 
-
-nextStateHelper(_,State,State,_,_).
-nextStateHelper(Plyr,State,State2,Move,Dir):-
- getDir(Move,Dir,Next),
- write(Next),
- (withinbounds(Next) -> 
-    get(State, Next,Value),
-    (Value = Plyr  -> nextStateHelper(Plyr,State,State,Move,Dir); 
-    Value = '.' -> nextStateHelper(Plyr,State,State,Move,Dir);
-    set(State, NewState1, Next, Plyr),
-    nextStateHelper(Plyr,State,NewState1,Move,Dir));
-    nextStateHelper(Plyr,State,State,Move,Dir)). 
-
-
-
- 
-getDir([X,Y],Dr,D):-
-  X1 is X - 1,X2 is X + 1,Y1 is Y - 1,Y2 is Y + 1,
- (Dr = n -> D = [X,Y1];
-  Dr = nw -> D = [X1,Y1];
-  Dr = ne -> D = [X2,Y1];
-  Dr = e -> D = [X2,Y];
-  Dr = se -> D = [X2,Y2];
-  Dr = s -> D = [X,Y2];
-  Dr = sw -> D = [X1,Y2];
-  Dr = w -> D = [X1,Y]).*/
-
-/*nextStateHelper(Plyr, State, NewState, [X, Y], [DX, DY]) :-
-  X1 is X+DX, Y1 is Y+DY, X2 is X+(2*DX), Y2 is Y+(2*DY),
-  withinbounds([X2, Y2]), get(State, [X1, Y1], First), get(State, [X2, Y2], Second),
-  First \== Second, Plyr == Second, \+ empty(First),
-  set(State, NewState1, [X2, Y2], Plyr), set(NewState1, NewState2, [X1, Y1], Plyr),
-  DX2 is -DX, DY2 is -DY,
-  setStones(Plyr, NewState2, NewState, [X1, Y1], [DX2, DY2]).
-nextStateHelper(Plyr, State, NewState, [X, Y], [DX, DY]) :-
-  X1 is X+DX, Y1 is Y+DY, X2 is X+(2*DX), Y2 is Y+(2*DY),
-  withinbounds([X2, Y2]), get(State, [X1, Y1], First), get(State, [X2, Y2], Second),
-  First == Second, Plyr \== First, \+ empty(First),
-  nextStateHelper(Plyr, State, NewState, [X1, Y1], [DX, DY]).
-nextStateHelper(_, State, State, _, _).
-
-setStones(Plyr, State, State, [X, Y], [DX, DY]) :-
-  X1 is X+DX, Y1 is Y+DY,
-  get(State, [X1, Y1], Cell),
-  Cell == Plyr.
-setStones(Plyr, State, NewState, [X, Y], [DX, DY]) :-
-  X1 is X+DX, Y1 is Y+DY,
-  set(State, NewState1, [X1, Y1], Plyr),
-  setStones(Plyr, NewState1, NewState, [X1, Y1], [DX, DY]).*/
-/*nextState(2,pass,State,State,1):- !.
-nextState(1,pass,State,State,2):- !.
-nextState(2,Move,State,NewState,1):-
- validDir(Move,Dir),
- help(State,2,Dir,Move,[],List),
- set(State,NS,Move,2),
- newStone(NS,2,List,NewState).
-
-nextState(1,Move,State,NewState,2):-
- validDir(Move,Dir),
- help(State,1,Dir,Move,[],List),
- set(State,NS,Move,1),
- newStone(NS,1,List,NewState).
-
-help(State,Plyr,[],Move,Acc,Acc).
-help(State,Plyr,[H1|T1],Move,Acc,MvList):-
- nextStateHelper(State,H1,Move,Plyr,[],List),
- append(List,Acc,Acc2),
- help(State,Plyr,T1,Move,Acc2,MvList).
-
-
-nextStateHelper(State,Dr,[],Plyr,Acc,Acc):- !.
-nextStateHelper(State,Dr,[],Plyr,[],[]):- !. 
-nextStateHelper(State,Dr,[X,Y],Plyr,Acc,Valid):-
- X1 is X - 1,X2 is X + 1,Y1 is Y - 1,Y2 is Y + 1,
- (Dr = n -> D = [X,Y1];
-  Dr = nw -> D = [X1,Y1];
-  Dr = ne -> D = [X2,Y1];
-  Dr = e -> D = [X2,Y];
-  Dr = se -> D = [X2,Y2];
-  Dr = s -> D = [X,Y2];
-  Dr = sw -> D = [X1,Y2];
-  Dr = w -> D = [X1,Y]),
- get(State, D, Value),
-
-
-
- nextStateHelper(State,Dr,[],Plyr,[],Valid);
- nextStateHelper(State,Dr,[],Plyr,Acc,Valid);  
- nextStateHelper(State,Dr,[],Plyr,[],Valid);
- nextStateHelper(State,Dr,D,Plyr,[D|Acc],Valid)). 
-
-newStone(State,Plyr,[],State):-!.
-newStone(State,Plyr,[H|T],NewState):-
- set(State,NewBoard,H,Plyr),
- newStone(NewBoard,Plyr,T,NewState).*/
-nextState(2,pass,State,State,1):- !.
-nextState(1,pass,State,State,2):- !.
-
+nextState(2,n,State,State,1):- !.
+nextState(1,n,State,State,2):- !.
 nextState(2,Move,State,NewState,1):-
  set(State,NS,Move,2),
- setNextStone(NS,Move,Plyr,NewState1,n),
+ setNextStone(NS,Move,2,NewState1,n),
  setNextStone(NewState1,Move,2,NewState2,nw),
  setNextStone(NewState2,Move,2,NewState3,ne),
  setNextStone(NewState3,Move,2,NewState4,e),
@@ -413,69 +310,103 @@ nextState(1,Move,State,NewState,2):-
  setNextStone(NewState6,Move,1,NewState7,sw),
  setNextStone(NewState7,Move,1,NewState,w).
 
-getDir([X,Y],Dr,D1,D2):-
+getDir([X,Y],Dr,D1,D2,D3):-
   X1 is X - 1,X2 is X + 1,Y1 is Y - 1,Y2 is Y + 1,
   X3 is X - 2,X4 is X + 2,Y3 is Y - 2,Y4 is Y + 2,
- (Dr = n  -> D1 = [X,Y1] , D2 = [X,Y3];
-  Dr = nw -> D1 = [X1,Y1], D2 =  [X3,Y3];
-  Dr = ne -> D1 = [X2,Y1], D2 = [X4,Y3];
-  Dr = e  -> D1 = [X2,Y] , D2 =  [X4,Y];
-  Dr = se -> D1 = [X2,Y2], D2 =  [X4,Y4];
-  Dr = s  -> D1 = [X,Y2] , D2 =  [X,Y4];
-  Dr = sw -> D1 = [X1,Y2], D2 =  [X3,Y4];
-  Dr = w  -> D1 = [X1,Y] , D2 = [X3,Y]).
+ (Dr = n  -> D1 = [X,Y1] , D2 = [X,Y3]  ,D3 = [0,-1];
+  Dr = nw -> D1 = [X1,Y1], D2 = [X3,Y3] ,D3 = [-1,-1];
+  Dr = ne -> D1 = [X2,Y1], D2 = [X4,Y3] ,D3 = [1,-1];
+  Dr = e  -> D1 = [X2,Y] , D2 = [X4,Y]  ,D3 = [1,0];
+  Dr = se -> D1 = [X2,Y2], D2 = [X4,Y4] ,D3 = [1,1];
+  Dr = s  -> D1 = [X,Y2] , D2 = [X,Y4]  ,D3 = [0,1];
+  Dr = sw -> D1 = [X1,Y2], D2 = [X3,Y4] ,D3 = [-1,1];
+  Dr = w  -> D1 = [X1,Y] , D2 = [X3,Y]  ,D3 = [-1,0]).
 
+checkBoundary([X, Y]) :- X >= 0, X =< 5, Y >= 0, Y =< 5.
 
 setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2),
- (\+withinbounds(D2)),
+ getDir([X,Y],Dir,D1,D2,D3),
+ (\+checkBoundary(D2)),
  NewState = State.
 
 setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2),
- withinbounds(D1),
- withinbounds(D2),
+ getDir([X,Y],Dir,D1,D2,D3),
+ checkBoundary(D1),
+ checkBoundary(D2),
  get(State, D1, Value1),
  get(State, D2, Value2),
  Value1 \= Value2,
  Plyr == Value2,
  Value1 \= '.',
  set(State, NewState1, D1, Plyr),
- set(NewState1, NewState, D1, Plyr),
- write(NewState).
+ set(NewState1, NewState2, D1, Plyr),
+ D3 = [X1,X2],
+ Dir2 = [-X1,-X2],
+ setStonesBack(NewState2,NewState,D1,Plyr,Dir2).
 
 setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2),
- withinbounds(D1),
- withinbounds(D2),
+ getDir([X,Y],Dir,D1,D2,D3),
+ checkBoundary(D1),
+ checkBoundary(D2),
  get(State, D1, Value1),
  get(State, D2, Value2),
  Value1 == '.',
  NewState = State.
 
 setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2),
- withinbounds(D1),
- withinbounds(D2),
+ getDir([X,Y],Dir,D1,D2,D3),
+ checkBoundary(D1),
+ checkBoundary(D2),
+ get(State, D1, Value1),
+ get(State, D2, Value2),
+ Value1 == Plyr,
+ NewState = State.
+
+setNextStone(State,[X,Y],Plyr,NewState,Dir):-
+ getDir([X,Y],Dir,D1,D2,D3),
+ checkBoundary(D1),
+ checkBoundary(D2),
+ get(State, D1, Value1),
+ get(State, D2, Value2),
+ Value1 \= Plyr,
+ Value2 = '.',
+ NewState = State.
+
+setNextStone(State,[X,Y],Plyr,NewState,Dir):-
+ getDir([X,Y],Dir,D1,D2,D3),
+ checkBoundary(D1),
+ checkBoundary(D2),
  get(State, D1, Value1),
  get(State, D2, Value2),
  Value1 == Value2,
  Plyr \= Value2,
  Value1 \= '.',
  setNextStone(State,D1,Plyr,NewState,Dir).
-setNextStone(State,_,_,State_).
+setNextStone(State,_,_,State_):- !.
+
+
+setStonesBack(State,State,[X1,Y1],Plyr,[X2,Y2]):-
+ X is X1+X2, 
+ Y is Y1+Y2,
+ get(State,[X,Y], P1),
+ P1 == Plyr.
+
+setStonesBack(State,NewState,[X1,Y1],Plyr,[X2,Y2]):-
+ X is (X1+X2), 
+ Y is (Y1+Y2),
+ set(State, NewState1 , [X, Y], Plyr),
+ setStonesBack(NewState1,NewState,[X,Y],Plyr,[X2,Y2]).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%validmove(Plyr,State,Proposed)%%%%%%%%%%%%%%%%%%%%
 %%
 %% define validmove(Plyr,State,Proposed).
 %   - true if Proposed move by Plyr is valid at State.
 
-validmove(Plyr,State,pass):- moves(Plyr, State, M), !, M = [pass]. 
+validmove(Plyr,State,n):- moves(Plyr, State, M), !, M = [n]. 
 validmove(Plyr,State,Proposed):-
  moves(Plyr,State,MvList),
  member(Proposed,MvList).
-
-withinbounds([X, Y]) :- X >= 0, X =< 5, Y >= 0, Y =< 5.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%h(State,Val)%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -487,18 +418,18 @@ withinbounds([X, Y]) :- X >= 0, X =< 5, Y >= 0, Y =< 5.
 %          the value of state (see handout on ideas about
 %          good heuristics.
 
-h(State,100) :- winner(State,1), !.
-h(State,-100) :- winner(State,2), !.
+h(State,1000) :- winner(State,1), !.
+h(State,-1000) :- winner(State,2), !.
 h(State,0) :- tie(State), !.
-h(State, Val) :- countStones(State, 0, 0, P1O, P2O), Val is (P2O - P1O).%(P1O > P2O -> Val is -33 ; Val is 33).
-
+h(State, Val) :- 
+ countStones(State, 0, 0, P1, P2), Val is (P2 - P1).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%lowerBound(B)%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% define lowerBound(B).
 %   - returns a value B that is less than the actual or heuristic value
 %     of all states.
 
-lowerBound(-101).
+lowerBound(-1001).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%upperBound(B)%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -506,7 +437,7 @@ lowerBound(-101).
 %   - returns a value B that is greater than the actual or heuristic value
 %     of all states.
 
-upperBound(101).
+upperBound(1001).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                       %
