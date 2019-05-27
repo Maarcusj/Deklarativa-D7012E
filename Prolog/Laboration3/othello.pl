@@ -1,45 +1,40 @@
 /* ----------------------------------------------------------
     CSE 3401 F12 Assignment 4 file
 
-% Surname:
-% First Name:
-% Student Number:
+% Surname: Johansson
+% First Name: Marcus
+% Student Number: johmah-3
 
   ------------------------------------------------------ */
 
 %do not chagne the follwoing line!
 :- ensure_loaded('play.pl').
+:- ensure_loaded('testboards.pl').
+:- ensure_loaded('stupid.pl').
+:- ensure_loaded('rndBoard.pl').
 
 %
 % Tests
 %
+%play.
 
-test1([[1,1,1,1,1,1],
-       [1,1,1,1,1,1],
-       [1,1,1,1,1,1],
-       [.,.,.,.,.,.],
-       [2,2,2,2,2,2],
-       [2,2,2,2,2,2]]).
-% test1(A), winner(A, B).
-% test1(A), tie(A).
-% test1(A), countStones(A, 0, 0, B, C).
+%tieInTwoMovesFullBoard(InitState), playgame(1,InitState).
+%winInTwoMovesFullBoard(InitState), playgame(1,InitState).
+%forcing1toDoNullMoves(InitState), playgame(1,InitState).
 
-test2([[.,.,.,.,.,.],
-       [.,.,.,.,.,.],
-       [.,.,1,2,.,.],
-       [.,.,2,1,.,.],
-       [.,.,2,.,.,.],
-       [.,.,.,.,.,.]]).
-% test2(A), moves(1, A, L).
-% test2(A), validmove(1, A, [2,5]).
+%rndBoardXYZ(InitialState),playgame(1,InitState).
+%rndBoardXYZ(InitialState),playgame(1,InitState).
+%rndBoardXYZ(InitialState),playgame(1,InitState).
 
-test3([[1,1,1,1,1,1],
-       [1,2,2,2,2,1],
-       [1,2,.,2,2,1],
-       [1,2,2,2,2,1],
-       [1,2,2,2,2,1],
-       [1,1,1,1,1,1]]).
-% test3(A), nextState(1,[2,2],A,B,C), showState(B).
+%Change: initialize(InitialState, 1) :- rndBoardXYZ(InitialState).
+%consult('othello.pl').
+%consult('stupid.pl').
+
+
+%Change back: initialize(B, 2) :- initBoard(B).
+%%consult('stupid.pl').
+%play.
+
 
 
 % /* ------------------------------------------------------ */
@@ -80,31 +75,23 @@ test3([[1,1,1,1,1,1],
 %    . means the position is  empty
 %    1 means player one has a stone in this position
 %    2 means player two has a stone in this position.
-
-human(1).
-computer(2).
-empty('.').
-%empty(X) :- not(human(X)), not(computer(X)).
-
 % given helper: Inital state of the board
 initBoard([ [.,.,.,.,.,.], 
-            [.,.,1,2,.,.],
+            [.,.,.,.,.,.],
           [.,.,1,2,.,.], 
           [.,.,2,1,.,.], 
             [.,.,.,.,.,.], 
           [.,.,.,.,.,.] ]).
-/*            [.,.,1,1,.,.],
-            [.,.,2,2,2,.], 
-            [.,.,2,1,.,.], 
-            [.,.,.,.,.,.], 
-            [.,.,.,.,.,.] ]).*/
 
 %%%%%%%%%%%%%%%%%% IMPLEMENT: initialize(...)%%%%%%%%%%%%%%%%%%%%%
 %%% Using initBoard define initialize(InitialState,InitialPlyr).
 %%%  holds iff InitialState is the initial state and
 %%%  InitialPlyr is the player who moves first.
 
+  
 initialize(B, 1) :- initBoard(B).
+initialize(B, 2) :- initBoard(B).
+%initialize(InitialState, 1) :- rndBoardXYZ(InitialState).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%winner(...)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -421,7 +408,23 @@ validmove(Plyr,State,Proposed):-
 h(State,1000) :- winner(State,1), !.
 h(State,-1000) :- winner(State,2), !.
 h(State,0) :- tie(State), !.
-h(State, Val) :- 
+
+h(State,Val):- get(State,[0,0],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+h(State,Val):- get(State,[0,0],Elem1),get(State,[0,5],Elem2),Elem2 == 2 ,Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 500 + (P2 - P1).
+h(State,Val):- get(State,[0,0],Elem1),get(State,[5,0],Elem2),Elem2 == 2 ,Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 500 + (P2 - P1).
+h(State,Val):- get(State,[5,5],Elem1),get(State,[0,5],Elem2),Elem2 == 2 ,Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 500 + (P2 - P1).
+h(State,Val):- get(State,[5,5],Elem1),get(State,[5,0],Elem2),Elem2 == 2 ,Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 500 + (P2 - P1).
+h(State,Val):- get(State,[5,5],Elem1),get(State,[0,0],Elem2),Elem2 == 2 ,Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 600 + (P2 - P1).
+
+h(State,Val):-get(State,[0,5],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+h(State,Val):-get(State,[5,0],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+h(State,Val):-get(State,[5,5],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+
+h(State, Val) :-
  countStones(State, 0, 0, P1, P2), Val is (P2 - P1).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%lowerBound(B)%%%%%%%%%%%%%%%%%%%%%%%%%
 %%

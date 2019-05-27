@@ -58,10 +58,16 @@ move(state(State,Skey,Bkey,Package),NewState,Move) :-
  Move = takePackage.  
 
 %state(room,skey,bkey,package)
-solveR(state(_,_,_,r2),_,[]) :-
+solveR(state(_,_,_,r2),_,[]).
 solveR(State,N,Trace) :-
  N > 0, 
  move(State,NewState,Move),
  \+(NewState = state(_,hand,hand,hand)),
  solveR(NewState,N-1,TraceCo),
- Trace = [Move|TraceCo].	
+ Trace = [Move|TraceCo].
+
+
+
+%solveR(state(r1,r1,r2,r3),12,X).
+
+
