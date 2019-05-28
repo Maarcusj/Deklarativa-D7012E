@@ -16,6 +16,8 @@
 %
 % Tests
 %
+%working_directory(CWD, 'c:/users/johan/Desktop/D7012E/Deklarativa-D7012E/Prolog/Laboration3' ).
+
 %play.
 
 %tieInTwoMovesFullBoard(InitState), playgame(1,InitState).
@@ -99,35 +101,53 @@ initialize(B, 2) :- initBoard(B).
 %     - returns winning player if State is a terminal position and
 %     Plyr has a higher score than the other player
 
+%Check if both players need to pass.
+%Count stones and return a winner which have the least stones on board.
 winner(State,Plyr):-
  checkMoves(State),
  countStones(State,0,0, P1 ,P2),
  (Plyr = 1, P1 < P2;
   Plyr = 2, P2 < P1).
-  /*write('Human has '),
-  write(P1O),
-  writeln(' stones'),
-  write('Computer has '),
-  write(P2O),
-  writeln(' stones').*/
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%tie(...)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% define tie(State) here.
 %    - true if terminal State is a "tie" (no winner)
 
+%Check if # stones are equal.
 tie(State) :- checkTie(State).
 
+%Check if both players only can pass.
+%Count # stones.
+%If equal return true.
 checkTie(State) :-
   checkMoves(State),
   countStones(State, 0, 0, P1, P2),
   (P1 = P2 -> true ; fail).
 
+%Returns true if both have only pass as move left.
 checkMoves(State) :- 
-moves(1, State, MvList1), !, 
-MvList1 = [n], !,
-moves(2, State, MvList2), !, 
-MvList2 = [n], !.
+ moves(1, State, MvList1), 
+ MvList1 = [n], !,
+ moves(2, State, MvList2), 
+ MvList2 = [n], !.
+
+/**
+countStones: 
+- calls getStones wich returns two lists with coordinates of every stone for each player value.
+- Check length of each list and return # stones in each list.  
+
+getStones:
+- Calls getRow hich returns two list with coordinates of each stones on each row.
+- Appends two accumulators and calls next row recursive.
+- Helper to moves.
+
+getRow:
+- Calls get(Board,cell,value), and retrive value of specific cell.
+- Append coordinates of that cell to list.
+- Recursive with accumelator and returns two lists with stones on each row. 
+ 
+*/
 
 countStones(State,Acc1,Acc2, P1 ,P2) :-
  getStones(State,0,0,[],[],S1,S2),
@@ -160,6 +180,7 @@ getRow(State,X,Y,Acc1,Acc2,P1,P2):-
 %% define terminal(State).
 %   - true if State is a terminal
 
+%Check if terminal state is reached.
 terminal(State) :- checkMoves(State), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%showState(State)%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -193,7 +214,33 @@ printList([H | L]) :-
 %% define moves(Plyr,State,MvList).
 %   - returns list MvList of all legal moves Plyr can make in State
 %
+/**
+moves:
+- Get stones for each player saved in two lists with coordinates with getStones.
+- Check which player and list to pass forward to rule help.
+- removes doubles of possible moves.
+- sort them left corner to right, then by row.  
 
+help:
+- Calls validDir to get possible move directions for first stone in list.
+- calls validHelp to with first of stones for that player.
+- gets valid moves and append them to accumelator.
+- Calls recurivly help for next stones in list of player stones.
+validHelp:
+- Calls check valid for each direction of stone.
+- If empty list returned, dont append.
+- Calles recurivly for every element in direction list. 
+checkValid:
+- Input coordinates and valid directions and calculate cells that should be checked for valid moves.
+- Get value of specific cell. 
+- Check if it's empty,oponent value or player value.
+- if empty and next is oponent and next is player value, its valid.
+- Calls checkvalid to see next stones after one. 
+- If a corner or border is reached , checkboundery returns false.
+validDir:
+- returns valid directions for each stone.
+- This is used to know which direction stones after should check. 
+*/
 moves(Plyr,State,MvList) :-
  getStones(State,0,0,[],[],P1,P2),
  (Plyr = 1 -> help(State,Plyr,P1,[],List);
@@ -249,6 +296,10 @@ validDir([X,Y],List):-
   Y = 5 -> List = [w,nw,n,ne,e];
   List = [n,ne,e,se,s,sw,w,nw]).
 
+
+/**
+- Classic insertionsort.
+*/
 insert(X, [], [X]):- !.
 insert(X, [X1|L1], [X, X1|L1]):- 
  X = [X3,Y3],
@@ -261,6 +312,9 @@ insert(X, [X1|L1], [X1|L]):- insert(X, L1, L).
 insertionSort([], []):- !.
 insertionSort([X|L], S):- insertionSort(L, S1), insert(X, S1, S).
 
+
+%Helper to remove doubles in MvList.
+%Could modify moves to remove this.  
 removeDouble([],Acc,Acc).
 removeDouble([H|T],Acc,NewList):-
  (member(H,T) -> removeDouble(T,Acc,NewList); 
@@ -272,7 +326,29 @@ removeDouble([H|T],Acc,NewList):-
 %   - given that Plyr makes Move in State, it determines NewState (i.e. the next
 %     state) and NextPlayer (i.e. the next player who will move).
 % 
+/**
+nextState:
+- Return same state if move is a pass and change current player.
+- Calls setNextStone for all directions around a cell.
+- Sends nextState into next setNextStone. 
+- Returns final state after every direction is checked.
 
+setNextStone:
+- Called for every direction of cell which is to be placed.
+- Have checks for every condition a cell can have. 
+- Checks two stones forward in evey direction.
+- This makes it possible to see when a new player value is reached and all between should be flipped.
+- Uses setStoneBack to flip previous visit stones when flip should be preformed. 
+
+getDir:
+- returns coordinates for two stones forward in the correct direction.
+
+setStonesBack:
+- when a state when current player have surround oponent stones a flip of every between is made.
+- This rule is used to go back and flip them. 
+- This was a major problem until this solution. 
+
+*/
 nextState(2,n,State,State,1):- !.
 nextState(1,n,State,State,2):- !.
 nextState(2,Move,State,NewState,1):-
@@ -390,10 +466,17 @@ setStonesBack(State,NewState,[X1,Y1],Plyr,[X2,Y2]):-
 %% define validmove(Plyr,State,Proposed).
 %   - true if Proposed move by Plyr is valid at State.
 
-validmove(Plyr,State,n):- moves(Plyr, State, M), !, M = [n]. 
+/**
+validmove: 
+- Check if the move to be preformed is a valid move.
+- Uses moves to get moves that can be made.
+- Check if proposed move is a member in MvList. 
+
+*/
+validmove(Plyr,State,n):- moves(Plyr, State, MvList),  MvList = [n], !. 
 validmove(Plyr,State,Proposed):-
  moves(Plyr,State,MvList),
- member(Proposed,MvList).
+ member(Proposed,MvList),!.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%h(State,Val)%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -404,7 +487,15 @@ validmove(Plyr,State,Proposed):-
 %   NOTE2. If State is not terminal h should be an estimate of
 %          the value of state (see handout on ideas about
 %          good heuristics.
-
+/**
+H: 
+- winning state gives val 1000 for player 1.
+- winning state gives val -1000 for player 2.
+- tie state gives val 0.
+- Place in Corners are given a value at 400 and two are given 500.
+- Makes computer avoid corners. 
+- Should add for player 1 also? If remove and only return actual value.  
+*/
 h(State,1000) :- winner(State,1), !.
 h(State,-1000) :- winner(State,2), !.
 h(State,0) :- tie(State), !.
@@ -422,6 +513,23 @@ h(State,Val):-get(State,[0,5],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2
 h(State,Val):-get(State,[5,0],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
 
 h(State,Val):-get(State,[5,5],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+%Tests
+h(State,Val):- get(State,[0,0],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+h(State,Val):- get(State,[0,0],Elem1),get(State,[0,5],Elem2),Elem2 == 1 ,Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is -500 + (P2 - P1).
+h(State,Val):- get(State,[0,0],Elem1),get(State,[5,0],Elem2),Elem2 == 1 ,Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is -500 + (P2 - P1).
+h(State,Val):- get(State,[5,5],Elem1),get(State,[0,5],Elem2),Elem2 == 1 ,Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is -500 + (P2 - P1).
+h(State,Val):- get(State,[5,5],Elem1),get(State,[5,0],Elem2),Elem2 == 1 ,Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is -500 + (P2 - P1).
+h(State,Val):- get(State,[5,5],Elem1),get(State,[0,0],Elem2),Elem2 == 1 ,Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is -600 + (P2 - P1).
+
+h(State,Val):-get(State,[0,5],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+h(State,Val):-get(State,[5,0],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+h(State,Val):-get(State,[5,5],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+
+
 
 
 h(State, Val) :-
