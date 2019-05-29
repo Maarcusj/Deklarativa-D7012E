@@ -158,9 +158,7 @@ mmeval(_,State,Val,_,_,1) :- terminal(State), !,
 % if depth bound reached, use evaluation function 
 mmeval(_,State,Val,_,0,1) :-  !,
   %writeln('Evaluation reached Depth Bnd'),
-  h(State,Val),
-  write(Val),
-  write('\t'). 
+  h(State,Val). 
  
 % FOR MAX PLAYER 
 % we assume that if player has no moves available, the position is 

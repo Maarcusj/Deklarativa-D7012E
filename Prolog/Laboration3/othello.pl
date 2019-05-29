@@ -1,11 +1,12 @@
-/* ----------------------------------------------------------
-    CSE 3401 F12 Assignment 4 file
-
-% Surname: Johansson
-% First Name: Marcus
-% Student Number: johmah-3
-
-  ------------------------------------------------------ */
+/* ------------------------------------------------------- */
+%
+%    D7012E Declarative languages
+%    Luleå University of Technology
+%
+%    Student full name: Marcus Johansson
+%    Student user id  : johmah-3
+%
+/* ------------------------------------------------------- */
 
 %do not chagne the follwoing line!
 :- ensure_loaded('play.pl').
@@ -17,6 +18,7 @@
 % Tests
 %
 %working_directory(CWD, 'c:/users/johan/Desktop/D7012E/Deklarativa-D7012E/Prolog/Laboration3' ).
+%consult('othello.pl').
 
 %play.
 
@@ -39,22 +41,25 @@
 
 
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 % /* ------------------------------------------------------ */
 %               IMPORTANT! PLEASE READ THIS SUMMARY:
 %       This files gives you some useful helpers (set &get).
 %       Your job is to implement several predicates using
-%       these helpers (feel free to add your own helpers if needed,
-%       MAKE SURE to write comments for all your helpers, marks will
-%       be deducted for bad style!).
+%       these helpers. Feel free to add your own helpers if
+%       needed, as long as you write comments (documentation)
+%       for all of them. 
 %
-%       Implement the following predicates at their designated space
-%       in this file (we suggest to have a look at file ttt.pl  to
-%       see how the implementations is done for game tic-tac-toe.
+%       Implement the following predicates at their designated
+%       space in this file. You might like to have a look at
+%       the file  ttt.pl  to see how the implementations is
+%       done for game tic-tac-toe.
 %
 %          * initialize(InitialState,InitialPlyr).
-%          * winner(State,Plyr)
+%          * winner(State,Plyr) 
 %          * tie(State)
-%          * terminal(State)
+%          * terminal(State) 
 %          * moves(Plyr,State,MvList)
 %          * nextState(Plyr,Move,State,NewState,NextPlyr)
 %          * validmove(Plyr,State,Proposed)
@@ -71,12 +76,21 @@
 
 % /* ------------------------------------------------------ */
 
-% We use the following State Representation:
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
+% We use the following State Representation: 
 % [Row0, Row1 ... Rown] (ours is 6x6 so n = 5 ).
-% each Rowi is a LIST of 6 elements '.' or '1' or '2' as follows:
+% each Rowi is a LIST of 6 elements '.' or '1' or '2' as follows: 
 %    . means the position is  empty
 %    1 means player one has a stone in this position
-%    2 means player two has a stone in this position.
+%    2 means player two has a stone in this position. 
+
+
+
+
+
+% DO NOT CHANGE THE COMMENT BELOW.
+%
 % given helper: Inital state of the board
 initBoard([ [.,.,.,.,.,.], 
             [.,.,.,.,.,.],
@@ -85,21 +99,25 @@ initBoard([ [.,.,.,.,.,.],
             [.,.,.,.,.,.], 
           [.,.,.,.,.,.] ]).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%% IMPLEMENT: initialize(...)%%%%%%%%%%%%%%%%%%%%%
-%%% Using initBoard define initialize(InitialState,InitialPlyr).
-%%%  holds iff InitialState is the initial state and
-%%%  InitialPlyr is the player who moves first.
+%%% Using initBoard define initialize(InitialState,InitialPlyr). 
+%%%  holds iff InitialState is the initial state and 
+%%%  InitialPlyr is the player who moves first. 
 
   
 initialize(B, 1) :- initBoard(B).
 initialize(B, 2) :- initBoard(B).
 %initialize(InitialState, 1) :- rndBoardXYZ(InitialState).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%winner(...)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%% define winner(State,Plyr) here.
+%% define winner(State,Plyr) here.  
 %     - returns winning player if State is a terminal position and
-%     Plyr has a higher score than the other player
+%     Plyr has a higher score than the other player 
 
 %Check if both players need to pass.
 %Count stones and return a winner which have the least stones on board.
@@ -109,10 +127,12 @@ winner(State,Plyr):-
  (Plyr = 1, P1 < P2;
   Plyr = 2, P2 < P1).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%tie(...)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%% define tie(State) here.
-%    - true if terminal State is a "tie" (no winner)
+%% define tie(State) here. 
+%    - true if terminal State is a "tie" (no winner) 
 
 %Check if # stones are equal.
 tie(State) :- checkTie(State).
@@ -149,12 +169,12 @@ getRow:
  
 */
 
-countStones(State,Acc1,Acc2, P1 ,P2) :-
+countStones(State,_,_, P1 ,P2) :-
  getStones(State,0,0,[],[],S1,S2),
  length(S1,P1),
  length(S2,P2).
 
-getStones(State,_,6,Acc1,Acc2,Acc1,Acc2).
+getStones(_,_,6,Acc1,Acc2,Acc1,Acc2).
 getStones(State,X,Y,Acc1,Acc2,P1,P2):-
  getRow(State,X,Y,[],[],P11,P22),
  append(P11,Acc1,A1),
@@ -162,7 +182,7 @@ getStones(State,X,Y,Acc1,Acc2,P1,P2):-
  Y1 is Y + 1,
  getStones(State,X,Y1,A1,A2,P1,P2).
 
-getRow(State,6,Y,Acc1,Acc2,Acc1,Acc2).
+getRow(_,6,_,Acc1,Acc2,Acc1,Acc2).
 getRow(State,X,Y,Acc1,Acc2,P1,P2):-
  X1 is X + 1,
  get(State,[X,Y],R),
@@ -175,14 +195,18 @@ getRow(State,X,Y,Acc1,Acc2,P1,P2):-
  R == '.',
  getRow(State,X1,Y,Acc1,Acc2,P1,P2)).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%terminal(...)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%% define terminal(State).
-%   - true if State is a terminal
+%% define terminal(State). 
+%   - true if State is a terminal  
 
 %Check if terminal state is reached.
 terminal(State) :- checkMoves(State), !.
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%showState(State)%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% given helper. DO NOT  change this. It's used by play.pl
 %%
@@ -209,9 +233,11 @@ printList([H | L]) :-
 	write(' '),
 	printList(L).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%moves(Plyr,State,MvList)%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% define moves(Plyr,State,MvList).
+%% 
+%% define moves(Plyr,State,MvList). 
 %   - returns list MvList of all legal moves Plyr can make in State
 %
 /**
@@ -250,22 +276,22 @@ moves(Plyr,State,MvList) :-
  insertionSort(List2,MvList)),!.
 
 
-help(State,Plyr,[],Acc,Acc):- !.
+help(_,_,[],Acc,Acc):- !.
 help(State,Plyr,[P1|P2],Acc,MvList):-
  validDir(P1,List),
  validHelp(State,Plyr,List,P1,[],Mv),
  append(Mv,Acc,Acc2),
  help(State,Plyr,P2,Acc2,MvList).
 
-validHelp(State,Plyr,[],P1,Acc,Acc):-!.
+validHelp(_,_,[],_,Acc,Acc):-!.
 validHelp(State,Plyr,[H1|T1],P1,Acc,MvList):-
  checkValid(State,H1,P1,Plyr,[],List),
  (List = [] -> validHelp(State,Plyr,T1,P1,Acc,MvList); 
  validHelp(State,Plyr,T1,P1,[List|Acc],MvList)).
 
 
-checkValid(State,Dr,[],Plyr,Acc,Acc):- !.
-checkValid(State,Dr,[],Plyr,[],[]):- !.
+checkValid(_,_,[],_,Acc,Acc):- !.
+checkValid(_,_,[],_,[],[]):- !.
 checkValid(State,Dr,[X,Y],Plyr,Acc,Valid):-
  X1 is X - 1,X2 is X + 1,Y1 is Y - 1,Y2 is Y + 1,
  (Dr = n -> D = [X,Y1];
@@ -320,12 +346,14 @@ removeDouble([H|T],Acc,NewList):-
  (member(H,T) -> removeDouble(T,Acc,NewList); 
  removeDouble(T,[H|Acc],NewList)).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%nextState(Plyr,Move,State,NewState,NextPlyr)%%%%%%%%%%%%%%%%%%%%
-%%
-%% define nextState(Plyr,Move,State,NewState,NextPlyr).
-%   - given that Plyr makes Move in State, it determines NewState (i.e. the next
+%% 
+%% define nextState(Plyr,Move,State,NewState,NextPlyr). 
+%   - given that Plyr makes Move in State, it determines NewState (i.e. the next 
 %     state) and NextPlayer (i.e. the next player who will move).
-% 
+%
 /**
 nextState:
 - Return same state if move is a pass and change current player.
@@ -387,8 +415,8 @@ getDir([X,Y],Dr,D1,D2,D3):-
 
 checkBoundary([X, Y]) :- X >= 0, X =< 5, Y >= 0, Y =< 5.
 
-setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2,D3),
+setNextStone(State,[X,Y],_,NewState,Dir):-
+ getDir([X,Y],Dir,_,D2,_),
  (\+checkBoundary(D2)),
  NewState = State.
 
@@ -407,26 +435,26 @@ setNextStone(State,[X,Y],Plyr,NewState,Dir):-
  Dir2 = [-X1,-X2],
  setStonesBack(NewState2,NewState,D1,Plyr,Dir2).
 
-setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2,D3),
+setNextStone(State,[X,Y],_,NewState,Dir):-
+ getDir([X,Y],Dir,D1,D2,_),
  checkBoundary(D1),
  checkBoundary(D2),
  get(State, D1, Value1),
- get(State, D2, Value2),
+ get(State, D2, _),
  Value1 == '.',
  NewState = State.
 
 setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2,D3),
+ getDir([X,Y],Dir,D1,D2,_),
  checkBoundary(D1),
  checkBoundary(D2),
  get(State, D1, Value1),
- get(State, D2, Value2),
+ get(State, D2, _),
  Value1 == Plyr,
  NewState = State.
 
 setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2,D3),
+ getDir([X,Y],Dir,D1,D2,_),
  checkBoundary(D1),
  checkBoundary(D2),
  get(State, D1, Value1),
@@ -436,7 +464,7 @@ setNextStone(State,[X,Y],Plyr,NewState,Dir):-
  NewState = State.
 
 setNextStone(State,[X,Y],Plyr,NewState,Dir):-
- getDir([X,Y],Dir,D1,D2,D3),
+ getDir([X,Y],Dir,D1,D2,_),
  checkBoundary(D1),
  checkBoundary(D2),
  get(State, D1, Value1),
@@ -461,9 +489,11 @@ setStonesBack(State,NewState,[X1,Y1],Plyr,[X2,Y2]):-
  setStonesBack(NewState1,NewState,[X,Y],Plyr,[X2,Y2]).
 
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%validmove(Plyr,State,Proposed)%%%%%%%%%%%%%%%%%%%%
-%%
-%% define validmove(Plyr,State,Proposed).
+%% 
+%% define validmove(Plyr,State,Proposed). 
 %   - true if Proposed move by Plyr is valid at State.
 
 /**
@@ -478,9 +508,11 @@ validmove(Plyr,State,Proposed):-
  moves(Plyr,State,MvList),
  member(Proposed,MvList),!.
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%h(State,Val)%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% define h(State,Val).
+%% 
+%% define h(State,Val). 
 %   - given State, returns heuristic Val of that state
 %   - larger values are good for Max, smaller values are good for Min
 %   NOTE1. If State is terminal h should return its true value.
@@ -515,7 +547,7 @@ h(State,Val):-get(State,[5,0],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2
 h(State,Val):-get(State,[5,5],Elem1),Elem1 == 2 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
 
 %Tests
-h(State,Val):- get(State,[0,0],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
+/*h(State,Val):- get(State,[0,0],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
 
 h(State,Val):- get(State,[0,0],Elem1),get(State,[0,5],Elem2),Elem2 == 1 ,Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is -500 + (P2 - P1).
 h(State,Val):- get(State,[0,0],Elem1),get(State,[5,0],Elem2),Elem2 == 1 ,Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is -500 + (P2 - P1).
@@ -528,28 +560,35 @@ h(State,Val):-get(State,[0,5],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2
 h(State,Val):-get(State,[5,0],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
 
 h(State,Val):-get(State,[5,5],Elem1),Elem1 == 1 ,countStones(State, 0, 0, P1, P2),Val is 400 + (P2 - P1).
-
+*/
 
 
 
 h(State, Val) :-
  countStones(State, 0, 0, P1, P2), Val is (P2 - P1).
+
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%lowerBound(B)%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% define lowerBound(B).
+%% 
+%% define lowerBound(B).  
 %   - returns a value B that is less than the actual or heuristic value
 %     of all states.
 
 lowerBound(-1001).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%upperBound(B)%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% define upperBound(B).
+%% 
+%% define upperBound(B). 
 %   - returns a value B that is greater than the actual or heuristic value
 %     of all states.
 
 upperBound(1001).
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                       %
 %                                                                       %
@@ -568,55 +607,63 @@ upperBound(1001).
 % [5,5] (on a 6x6 board).
 %
 % Example
-% ?- initBoard(B), showState(B), get(B, [2,3], Value).
-%. . . . . .
-%. . . . . .
-%. . 1 2 . .
-%. . 2 1 . .
-%. . . . . .
-%. . . . . .
+% ?- initBoard(B), showState(B), get(B, [2,3], Value). 
+%. . . . . . 
+%. . . . . . 
+%. . 1 2 . . 
+%. . 2 1 . . 
+%. . . . . . 
+%. . . . . . 
 %
-%B = [['.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.'],
-%     ['.', '.', 1, 2, '.', '.'], ['.', '.', 2, 1, '.'|...],
+%B = [['.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.'], 
+%     ['.', '.', 1, 2, '.', '.'], ['.', '.', 2, 1, '.'|...], 
 %     ['.', '.', '.', '.'|...], ['.', '.', '.'|...]]
-%Value = 2
+%Value = 2 
 %Yes
-%?-
+%?- 
 %
 % Setting values on the board
-% ?- initBoard(B),  showState(B),set(B, NB1, [2,4], 1), set(NB1, NB2, [2,3], 1),  showState(NB2).
+% ?- initBoard(B),  showState(B),set(B, NB1, [2,4], 1),
+%         set(NB1, NB2, [2,3], 1),  showState(NB2). 
 %
+% . . . . . . 
+% . . . . . . 
+% . . 1 2 . . 
+% . . 2 1 . . 
+% . . . . . . 
 % . . . . . .
-% . . . . . .
-% . . 1 2 . .
-% . . 2 1 . .
-% . . . . . .
+% 
+% . . . . . . 
+% . . . . . . 
+% . . 1 2 . . 
+% . . 1 1 . . 
+% . . 1 . . . 
 % . . . . . .
 %
-% . . . . . .
-% . . . . . .
-% . . 1 2 . .
-% . . 1 1 . .
-% . . 1 . . .
-% . . . . . .
-%
-%B = [['.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.'], ['.', '.',
+%B = [['.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.'], ['.', '.', 
 %1, 2, '.', '.'], ['.', '.', 2, 1, '.'|...], ['.', '.', '.', '.'|...], ['.', '.',
 % '.'|...]]
 %NB1 = [['.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.'], ['.', '.'
 %, 1, 2, '.', '.'], ['.', '.', 2, 1, '.'|...], ['.', '.', 1, '.'|...], ['.', '.
 %', '.'|...]]
 %NB2 = [['.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.'], ['.', '.'
-%, 1, 2, '.', '.'], ['.', '.', 1, 1, '.'|...], ['.', '.', 1, '.'|...], ['.',
+%, 1, 2, '.', '.'], ['.', '.', 1, 1, '.'|...], ['.', '.', 1, '.'|...], ['.', 
 %'.', '.'|...]]
 
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
 % get(Board, Point, Element): get the value of the board at position
 % column X and row Y (indexing starts at 0).
+% Do not change get:
 get( Board, [X, Y], Value) :-
 	nth0( Y, Board, ListY),
 	nth0( X, ListY, Value).
 
-% set( Board, NewBoard, [X, Y], Value)
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
+% set( Board, NewBoard, [X, Y], Value): set the value of the board at position
+% column X and row Y to Value (indexing starts at 0). Returns the new board as
+% NewBoard. Do not change set:
 
 set( [Row|RestRows], [NewRow|RestRows], [X, 0], Value)
     :- setInList(Row, NewRow, X, Value).
@@ -626,7 +673,10 @@ set( [Row|RestRows], [Row|NewRestRows], [X, Y], Value) :-
 	Y1 is Y-1,
 	set( RestRows, NewRestRows, [X, Y1], Value).
 
-% setInList( List, NewList, Index, Value)
+% DO NOT CHANGE THIS BLOCK OF COMMENTS.
+%
+% setInList( List, NewList, Index, Value): given helper to set. Do not
+% change setInList:
 
 setInList( [_|RestList], [Value|RestList], 0, Value).
 
