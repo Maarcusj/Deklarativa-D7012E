@@ -473,7 +473,7 @@ setNextStone(State,[X,Y],Plyr,NewState,Dir):-
  Plyr \= Value2,
  Value1 \= '.',
  setNextStone(State,D1,Plyr,NewState,Dir).
-setNextStone(State,_,_,State_):- !.
+%setNextStone(State,_,_,State_):- !.
 
 
 setStonesBack(State,State,[X1,Y1],Plyr,[X2,Y2]):-
